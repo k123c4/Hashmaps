@@ -3,60 +3,42 @@ import java.util.*;
 public class Radix_Sort{
 
     public static void main(String[] args) {
-        String[] input = { "solo", "pupperino", "amaterasu", "amazon", "puppy", "hydra", "amazonia", "vueltiao"};
-
-        List<String> list = new ArrayList<>(Arrays.asList(input));
-        String[] s = list.toArray(new String[0]);
+        String[] s = {"google", "gojo", "amazingly", "jogo", "luna", "pup","amazon", "puppy", "hydra", "amazonia", "vueltiao", "ama"};
 
         radixSort(s);
 
+        // Print final result
         System.out.println(String.join(", ", s));
     }
 
     public static void radixSort(String[] arr) {
-        if (arr == null || arr.length == 0) return;
-
-
         int maxLength = 0;
-        for (String str : arr) {
-            maxLength = Math.max(maxLength, str.length());
-        }
+        for (String str : arr) maxLength = Math.max(maxLength, str.length());
 
+        // Process from rightmost character to leftmost
         for (int d = maxLength - 1; d >= 0; d--) {
-            countingSortByCharacter(arr, d);
+
+            Map<Integer, List<String>> buckets = new HashMap<>();
+
+            for (String str : arr) {
+                // Use -1 for strings that are shorter than current index d
+                int charVal = (d < str.length()) ? (int) str.charAt(d) : -1;
+
+                buckets.putIfAbsent(charVal, new ArrayList<>());
+                buckets.get(charVal).add(str);
+            }
+
+
+            int index = 0;
+
+            List<Integer> sortedKeys = new ArrayList<>(buckets.keySet());
+            Collections.sort(sortedKeys);
+
+            for (int key : sortedKeys) {
+                for (String str : buckets.get(key)) {
+                    arr[index++] = str;
+                }
+            }
         }
-    }
-
-    private static void countingSortByCharacter(String[] arr, int d) {
-        int n = arr.length;
-        String[] output = new String[n];
-
-        int[] count = new int[257];
-
-        for (int i = 0; i < n; i++) {
-            int charIndex = getCharIndex(arr[i], d);
-            count[charIndex + 1]++;
-        }
-
-        for (int i = 1; i < 257; i++) {
-            count[i] += count[i - 1];
-        }
-
-        for (int i = n - 1; i >= 0; i--) {
-            int charIndex = getCharIndex(arr[i], d);
-            output[count[charIndex + 1] - 1] = arr[i];
-            count[charIndex + 1]--;
-        }
-
-
-        System.arraycopy(output, 0, arr, 0, n);
-    }
-
-
-    private static int getCharIndex(String s, int d) {
-        if (d >= s.length()) {
-            return -1;
-        }
-        return s.charAt(d);
     }
 }
